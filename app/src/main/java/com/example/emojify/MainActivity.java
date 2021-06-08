@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTitleTextView;
 
     private String mTempPhotoPath;
+    private String mFinalPhotoPath = "";
+    private Boolean mImageIsSaved = false;
 
     private Bitmap mResultsBitmap;
 
@@ -174,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Set the new bitmap to the ImageView
         mImageView.setImageBitmap(mResultsBitmap);
+        mImageIsSaved = false;
     }
 
 
@@ -183,11 +186,18 @@ public class MainActivity extends AppCompatActivity {
      * @param view The save button.
      */
     public void saveMe(View view) {
-        // Delete the temporary image file
-        BitmapUtils.deleteImageFile(this, mTempPhotoPath);
 
         // Save the image
         BitmapUtils.saveImage(this, mResultsBitmap);
+        if (!mImageIsSaved) {
+            mFinalPhotoPath = BitmapUtils.saveImage(this, mResultsBitmap);
+            mImageIsSaved = true;
+        } else {
+            Toast.makeText(this, "Image is already saved", Toast.LENGTH_SHORT).show();
+        }
+
+        // Delete the temporary image file
+        BitmapUtils.deleteImageFile(this, mTempPhotoPath);
     }
 
     /**
@@ -196,14 +206,19 @@ public class MainActivity extends AppCompatActivity {
      * @param view The share button.
      */
     public void shareMe(View view) {
+
+        if (!mImageIsSaved) {
+            mFinalPhotoPath = BitmapUtils.saveImage(this, mResultsBitmap);
+            mImageIsSaved = true;
+        } else {
+            Toast.makeText(this, "Image is already saved ;-)", Toast.LENGTH_SHORT).show();
+        }
+
+        BitmapUtils.shareImage(this, mFinalPhotoPath);
+
         // Delete the temporary image file
         BitmapUtils.deleteImageFile(this, mTempPhotoPath);
 
-        // Save the image
-        BitmapUtils.saveImage(this, mResultsBitmap);
-
-        // Share the image
-        BitmapUtils.shareImage(this, mTempPhotoPath);
     }
 
     /**
@@ -219,6 +234,8 @@ public class MainActivity extends AppCompatActivity {
         mShareFab.setVisibility(View.GONE);
         mSaveFab.setVisibility(View.GONE);
         mClearFab.setVisibility(View.GONE);
+
+        mImageIsSaved = false;
 
         // Delete the temporary image file
         BitmapUtils.deleteImageFile(this, mTempPhotoPath);
