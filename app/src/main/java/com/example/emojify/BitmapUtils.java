@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.DisplayMetrics;
@@ -32,7 +33,7 @@ public class BitmapUtils {
      * @param imagePath The path of the photo to be resampled.
      * @return The resampled bitmap
      */
-    static Bitmap resamplePic(Context context, String imagePath) {
+    static Bitmap resamplePic(Context context, String imagePath, int orientation) {
 
         // Get device screen size information
         DisplayMetrics metrics = new DisplayMetrics();
@@ -56,7 +57,15 @@ public class BitmapUtils {
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
 
-        return BitmapFactory.decodeFile(imagePath);
+        Bitmap bitmapOrg = BitmapFactory.decodeFile(imagePath);
+        if(orientation == 1) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(-90);
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmapOrg, bitmapOrg.getWidth(), bitmapOrg.getHeight(), true);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+            return rotatedBitmap;
+        }
+        return bitmapOrg;
     }
 
     /**
